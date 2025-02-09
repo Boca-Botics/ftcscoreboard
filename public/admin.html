@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        * {
+            font-family: Arial, Helvetica, sans-serif;
+            transition: 0.3s;
+        }
+
+        body {
+            background-color: red;
+            color: white;
+            margin: 0;
+        }
+
+        .top-bar {
+            width: 100%;
+            height: auto;
+            padding: 5px;
+            text-align: center;
+            margin: auto;
+            background-color: white;
+            color: black;
+        }
+
+        .scores-wrapper {
+            display: flex;
+            justify-content: space-between;
+            /* Adjust alignment */
+            gap: 20px;
+            /* Adjust spacing between them */
+        }
+
+        .scorescontainer {
+            flex: 1;
+            /* Both take equal width */
+            text-align: center;
+            padding: 10px;
+        }
+    </style>
+</head>
+
+<body id="body">
+    <div class="top-bar">
+        <h1>Time: <span id="time">2:00</span> | Total: <span id="totalpoints">0</span></h1>
+    </div>
+    <button onclick="starttimer(159)">Start Timer</button>
+    <button onclick="stoptimer()">Stop Timer</button>
+    <button onclick="starttimer(128)">Start from teleop</button>
+    <button onclick="reloadclients()">Reload</button>
+    <br>
+    <details>
+        <summary>Options</summary>
+        <p>Background Color</p>
+        <input type="color" id="bgcolor" onchange="updatescores()" value="#FF0000">
+        <br>
+        <p>Silent Mode</p>
+        <input type="checkbox" value="False" id="silent" onchange="updatescores()">
+        <p>Developer Mode</p>
+        <input type="checkbox" value="False" id="dev" onchange="updatescores()">
+    </details>
+    <hr>
+    <div class="scores-wrapper">
+        <div class="scorescontainer">
+            <p>High Basket:</p>
+            <input type="number" id="hb" onchange="updatescores()" value="0">
+            <p>Low Basket:</p>
+            <input type="number" id="lb" onchange="updatescores()" value="0">
+            <p>Net Basket:</p>
+            <input type="number" id="net" onchange="updatescores()" value="0">
+            <p>High Chamber:</p>
+            <input type="number" id="hc" onchange="updatescores()" value="0">
+            <p>Low Chamber:</p>
+            <input type="number" id="lc" onchange="updatescores()" value="0">
+            <br>
+            <p>Major Penalty:</p>
+            <input type="number" id="map" onchange="updatescores()" value="0">
+            <p>Minor Penalty:</p>
+            <input type="number" id="mip" onchange="updatescores()" value="0">
+            <p>Location:</p>
+            <select id="lo" onchange="updatescores()">
+                <option value="None">--</option>
+                <option value="Observation Zone">OZ</option>
+                <option value="Level 1">Level 1</option>
+                <option value="Level 2">Level 2</option>
+                <option value="Level 3">Level 3</option>
+            </select>
+        </div>
+        <div class="scorescontainer">
+            <p>Driver:</p>
+            <input type="text" id="driver" onchange="updatescores()">
+            <p>Operator:</p>
+            <input type="text" id="operator" onchange="updatescores()">
+            <p>Human Player:</p>
+            <input type="text" id="human" onchange="updatescores()">
+            <p>Driving Coach:</p>
+            <input type="text" id="coach" onchange="updatescores()">
+        </div>
+    </div>
+    <button onclick="reset()">Reset</button>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+
+        function reloadclients() {
+            socket.emit('reload')
+        }
+
+        function starttimer(time) {
+            socket.emit('starttimer', time)
+        }
+
+        function stoptimer() {
+            socket.emit('stoptimer')
+        }
+
+        socket.on('updateall', (msg) => {
+            document.getElementById('time').innerHTML = formatTime(msg.time);
+            console.log(msg);
+        })
+
+        function updatescores() {
+            const json = {
+                'hb': document.getElementById('hb').value,
+                'lb': document.getElementById('lb').value,
+                'net': document.getElementById('net').value,
+                'hc': document.getElementById('hc').value,
+                'lc': document.getElementById('lc').value,
+                'map': document.getElementById('map').value,
+                'mip': document.getElementById('mip').value,
+                'lo': document.getElementById('lo').value,
+                'bgcolor': document.getElementById('bgcolor').value,
+                'silent': document.getElementById('silent').checked,
+                'dev': document.getElementById('dev').checked,
+                'driver': document.getElementById('driver').value,
+                'operator': document.getElementById('operator').value,
+                'human': document.getElementById('human').value,
+                'coach': document.getElementById('coach').value,
+            }
+
+            socket.emit('updatescores', json)
+        }
+
+        function reset() {
+            document.getElementById('hb').value = 0;
+            document.getElementById('lb').value = 0;
+            document.getElementById('net').value = 0;
+            document.getElementById('hc').value = 0;
+            document.getElementById('lc').value = 0;
+            document.getElementById('map').value = 0;
+            document.getElementById('mip').value = 0;
+            document.getElementById('lo').value = 'None';
+            document.getElementById('driver').value = 'None';
+            document.getElementById('operator').value = 'None';
+            document.getElementById('human').value = 'None';
+            document.getElementById('coach').value = 'None';
+            updatescores()
+        }
+
+        socket.on('updateall', (msg) => {
+            document.getElementById('totalpoints').innerHTML = msg.total;
+            document.getElementById('body').style.backgroundColor = msg.bgcolor;
+        })
+
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            return `${mins}:${secs.toString().padStart(2, '0')}`;
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        * {
+            font-family: Arial, Helvetica, sans-serif;
+            transition: 0.3s;
+        }
+
+        body {
+            background-color: red;
+            color: white;
+            margin: 0;
+        }
+
+        .top-bar {
+            width: 100%;
+            height: auto;
+            padding: 5px;
+            text-align: center;
+            margin: auto;
+            background-color: white;
+            color: black;
+        }
+
+        .scores-wrapper {
+            display: flex;
+            justify-content: space-between;
+            /* Adjust alignment */
+            gap: 20px;
+            /* Adjust spacing between them */
+        }
+
+        .scorescontainer {
+            flex: 1;
+            /* Both take equal width */
+            text-align: center;
+            padding: 10px;
+        }
+    </style>
+</head>
+
+<body id="body">
+    <button id="dev">Start Audio</button>
+    <audio id="player" src></audio>
+    <div class="top-bar">
+        <h1>Time: <span id="time">2:00</span> | Total: <span id="totalpoints">0</span></h1>
+    </div>
+    <div class="scores-wrapper">
+        <div class="scorescontainer">
+            <h2>High Basket: <span id="hb" style="font-weight: bold;">0</span></h2>
+            <h2>Low Basket: <span id="lb" style="font-weight: bold;">0</span></h2>
+            <h2>NET: <span id="net" style="font-weight: bold;">0</span></h2>
+
+            <h2>High Chamber: <span id="hc" style="font-weight: bold;">0</span></h2>
+            <h2>Low Chamber: <span id="lc" style="font-weight: bold;">0</span></h2>
+            <h2>Location: <span id="lo" style="font-weight: bold;">0</span></h2>
+            <h2>Penalty: <span id="mip" style="font-weight: bold;">0</span> Minor | <span id="map"
+                    style="font-weight: bold;">0</span> Major</h2>
+        </div>
+        <div class="scorescontainer">
+            <h2>Driver: <span id="driver" style="font-weight: bold;">None</span></h2>
+            <h2>Operator: <span id="operator" style="font-weight: bold;">None</span></h2>
+            <h2>Human Player: <span id="human" style="font-weight: bold;">none</span></h2>
+            <h2>Driving Coach: <span id="coach" style="font-weight: bold;">None</span></h2>
+        </div>
+    </div>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+        const player = document.getElementById('player')
+
+        socket.on('reload', (msg) => {
+            window.location.reload()
+        })
+
+        socket.on('updateall', (msg) => {
+            document.getElementById('time').innerHTML = formatTime(msg.time);
+            console.log(msg);
+
+            document.getElementById('hb').innerHTML = msg.hb;
+            document.getElementById('lb').innerHTML = msg.lb;
+            document.getElementById('net').innerHTML = msg.net;
+            document.getElementById('hc').innerHTML = msg.hc;
+            document.getElementById('lc').innerHTML = msg.lc;
+            document.getElementById('map').innerHTML = msg.map;
+            document.getElementById('mip').innerHTML = msg.mip;
+            document.getElementById('totalpoints').innerHTML = msg.total;
+            document.getElementById('lo').innerHTML = msg.lo;
+
+            document.getElementById('driver').innerHTML = msg.driver;
+            document.getElementById('operator').innerHTML = msg.operator;
+            document.getElementById('human').innerHTML = msg.human;
+            document.getElementById('coach').innerHTML = msg.coach;
+
+            document.getElementById('body').style.backgroundColor = msg.bgcolor;
+
+            if (msg.dev == true) {
+                document.getElementById('dev').style.display = 'block'
+            } else {
+                document.getElementById('dev').style.display = 'none'
+            }
+
+            if (msg.time == 158 && msg.silent == false) {
+                player.src = '/audio/match_start.mp3';
+                player.play();
+            }
+
+            if (msg.time == 128 && msg.silent == false) {
+                player.src = '/audio/auto_complete.mp3';
+                player.play();
+            }
+
+            if (msg.time == 126 && msg.silent == false) {
+                player.src = '/audio/drivers_controllers.mp3';
+                player.play();
+            }
+
+            if (msg.time == 123 && msg.silent == false) {
+                player.src = '/audio/teleop_start.mp3';
+                player.play();
+            }
+
+            if (msg.time == 30 && msg.silent == false) {
+                player.src = '/audio/endgame_start.mp3';
+                player.play();
+            }
+
+            if (msg.time == 1 && msg.silent == false) {
+                player.src = '/audio/match_end.mp3';
+                player.play();
+            }
+        })
+
+
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            return `${mins}:${secs.toString().padStart(2, '0')}`;
+        }
+
+
+
+    </script>
+</body>
+
+</html>

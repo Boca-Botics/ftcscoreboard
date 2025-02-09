@@ -1,0 +1,98 @@
+const express = require('express');
+const { createServer } = require('node:http');
+const { join } = require('node:path');
+const { Server } = require('socket.io');
+
+const app = express();
+const server = createServer(app);
+const io = new Server(server);
+
+var time = 0;
+var settings = {
+  'time': 0,
+  'hb': 0,
+  'lb': 0,
+  'net': 0,
+  'hc': 0,
+  'lc': 0,
+  'map': 0,
+  'mip': 0,
+  'lo': 0,
+  'bgcolor': '#FF0000',
+  'silent': 0,
+  'total': 0
+}
+
+app.use(express.static('public'))
+
+io.on('connection', (socket) => {
+  console.log('a user connected');
+
+  socket.on('reload', (msg) => {
+    io.emit('reload');
+  })
+
+  socket.on('starttimer', (msg) => {
+    settings.time = msg;
+  })
+
+  socket.on('stoptimer', (msg) => {
+    settings.time = 0;
+  })
+
+  socket.on('updatescores', (msg) => {
+    var hangpoints = 0;
+
+    settings = {
+      'time': settings.time,
+      'hb': msg.hb,
+      'lb': msg.lb,
+      'net': msg.net,
+      'hc': msg.hc,
+      'lc': msg.lc,
+      'map': msg.map,
+      'mip': msg.mip,
+      'lo': msg.lo,
+      'bgcolor': msg.bgcolor,
+      'silent': msg.silent,
+      'dev': msg.dev,
+      'driver': msg.driver,
+      'operator': msg.operator,
+      'human': msg.human,
+      'coach': msg.coach
+    }
+
+    if (msg.lo == "None") {
+      hangpoints = 0;
+    }
+    if (msg.lo == "Observation Zone" || settings.lo == "Level 1") {
+      hangpoints = 3;
+    }
+    if (msg.lo == "Level 2") {
+      hangpoints = 15;
+    }
+    if (msg.lo == "Level 3") {
+      hangpoints = 30;
+    }
+
+    settings.total = ((msg.hb*8) + (msg.lb*4) + (msg.net*2) + (msg.hc*10) + (msg.lc*6) + hangpoints) - ((msg.map*15) + (msg.mip*5))
+
+    io.emit('updateall', settings)
+  })
+});
+
+function updateLoop() {
+  //console.log('updateloop')
+
+  if (settings.time > 0) {
+    settings.time--
+  }
+
+  io.emit('updateall', settings)
+}
+
+setInterval(updateLoop, 1000)
+
+server.listen(3000, () => {
+  console.log('server running at http://localhost:3000');
+});
