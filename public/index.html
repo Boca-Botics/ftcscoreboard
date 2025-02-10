@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         * {
             font-family: Arial, Helvetica, sans-serif;
@@ -15,6 +16,7 @@
             background-color: red;
             color: white;
             margin: 0;
+            overflow-x: hidden;
         }
 
         .top-bar {
@@ -25,6 +27,7 @@
             margin: auto;
             background-color: white;
             color: black;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
         }
 
         .scores-wrapper {
@@ -143,7 +146,16 @@
             return `${mins}:${secs.toString().padStart(2, '0')}`;
         }
 
-
+        socket.on('alert', (msg) => {
+            Swal.fire({
+                icon: msg.type,
+                text: msg.body,
+                title: msg.title,
+                showConfirmButton: false,
+                timer: msg.time,
+                timerProgressBar: true
+            });
+        })
 
     </script>
 </body>

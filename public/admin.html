@@ -15,6 +15,7 @@
             background-color: red;
             color: white;
             margin: 0;
+            overflow-x: hidden;
         }
 
         .top-bar {
@@ -25,6 +26,10 @@
             margin: auto;
             background-color: white;
             color: black;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+            position: sticky;
+            top: 0;
+            z-index: 1;
         }
 
         .scores-wrapper {
@@ -41,6 +46,88 @@
             text-align: center;
             padding: 10px;
         }
+
+        /* CSS */
+        .button-4 {
+            appearance: none;
+            background-color: #FAFBFC;
+            border: 1px solid rgba(27, 31, 35, 0.15);
+            border-radius: 6px;
+            box-shadow: rgba(27, 31, 35, 0.04) 0 1px 0, rgba(255, 255, 255, 0.25) 0 1px 0 inset;
+            box-sizing: border-box;
+            color: #24292E;
+            cursor: pointer;
+            display: inline-block;
+            font-family: -apple-system, system-ui, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+            font-size: 14px;
+            font-weight: 500;
+            line-height: 20px;
+            list-style: none;
+            padding: 6px 16px;
+            position: relative;
+            transition: background-color 0.2s cubic-bezier(0.3, 0, 0.5, 1);
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: manipulation;
+            vertical-align: middle;
+            white-space: nowrap;
+            word-wrap: break-word;
+        }
+
+        .button-4:hover {
+            background-color: #F3F4F6;
+            text-decoration: none;
+            transition-duration: 0.1s;
+        }
+
+        .button-4:disabled {
+            background-color: #FAFBFC;
+            border-color: rgba(27, 31, 35, 0.15);
+            color: #959DA5;
+            cursor: default;
+        }
+
+        .button-4:active {
+            background-color: #EDEFF2;
+            box-shadow: rgba(225, 228, 232, 0.2) 0 1px 0 inset;
+            transition: none 0s;
+        }
+
+        .button-4:focus {
+            outline: 1px transparent;
+        }
+
+        .button-4:before {
+            display: none;
+        }
+
+        .button-4:-webkit-details-marker {
+            display: none;
+        }
+
+        .textbox {
+
+            padding: 6px 12px;
+            font-size: 16px;
+            font-weight: 400;
+            line-height: 1.5;
+            color: #212529;
+            background-color: #fff;
+            background-clip: padding-box;
+            border: 1px solid #ced4da;
+            appearance: none;
+            border-radius: 4px;
+            transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+
+            :focus {
+                color: #212529;
+                background-color: #fff;
+                border-color: #86b7fe;
+                outline: 0;
+                box-shadow: 0 0 0 0.25rem rgb(13 110 253 / 25%);
+            }
+
+        }
     </style>
 </head>
 
@@ -48,41 +135,70 @@
     <div class="top-bar">
         <h1>Time: <span id="time">2:00</span> | Total: <span id="totalpoints">0</span></h1>
     </div>
-    <button onclick="starttimer(159)">Start Timer</button>
-    <button onclick="stoptimer()">Stop Timer</button>
-    <button onclick="starttimer(128)">Start from teleop</button>
-    <button onclick="reloadclients()">Reload</button>
     <br>
-    <details>
-        <summary>Options</summary>
-        <p>Background Color</p>
-        <input type="color" id="bgcolor" onchange="updatescores()" value="#FF0000">
-        <br>
-        <p>Silent Mode</p>
-        <input type="checkbox" value="False" id="silent" onchange="updatescores()">
-        <p>Developer Mode</p>
-        <input type="checkbox" value="False" id="dev" onchange="updatescores()">
-    </details>
-    <hr>
+    <center>
+        <button onclick="starttimer(159)" class="button-4">Start Timer</button>
+        <button onclick="stoptimer()" class="button-4">Stop Timer</button>
+        <button onclick="starttimer(128)" class="button-4">Start from teleop</button>
+        <button onclick="reset()" class="button-4">Reset</button>
+        <button onclick="submitalert('warning', 7000, 'Final Score: '+document.getElementById('totalpoints').innerHTML)" class="button-4">Release scores</button>
+        <br><br>
+        <details>
+            <summary>Options</summary>
+            <p>Background Color</p>
+            <input type="color" id="bgcolor" onchange="updatescores()" value="#FF0000">
+            <br>
+            <p>Silent Mode</p>
+            <input type="checkbox" value="False" id="silent" onchange="updatescores()">
+            <p>Developer Mode</p>
+            <input type="checkbox" value="False" id="dev" onchange="updatescores()">
+            <br>
+            <button onclick="reloadclients()">Reload</button>
+            <br>
+            <button onclick="socket.emit('shutdown')">Shut down server</button>
+        </details>
+    </center>
     <div class="scores-wrapper">
         <div class="scorescontainer">
             <p>High Basket:</p>
-            <input type="number" id="hb" onchange="updatescores()" value="0">
+            <button onclick="changeValue('hb', -1)">-</button>
+            <input type="number" class="textbox" id="hb" onchange="updatescores()" value="0">
+            <button onclick="changeValue('hb', 1)">+</button>
+
             <p>Low Basket:</p>
-            <input type="number" id="lb" onchange="updatescores()" value="0">
+            <button onclick="changeValue('lb', -1)">-</button>
+            <input type="number" class="textbox" id="lb" onchange="updatescores()" value="0">
+            <button onclick="changeValue('lb', 1)">+</button>
+
             <p>Net Basket:</p>
-            <input type="number" id="net" onchange="updatescores()" value="0">
+            <button onclick="changeValue('net', -1)">-</button>
+            <input type="number" class="textbox" id="net" onchange="updatescores()" value="0">
+            <button onclick="changeValue('net', 1)">+</button>
+
             <p>High Chamber:</p>
-            <input type="number" id="hc" onchange="updatescores()" value="0">
+            <button onclick="changeValue('hc', -1)">-</button>
+            <input type="number" class="textbox" id="hc" onchange="updatescores()" value="0">
+            <button onclick="changeValue('hc', 1)">+</button>
+
             <p>Low Chamber:</p>
-            <input type="number" id="lc" onchange="updatescores()" value="0">
+            <button onclick="changeValue('lc', -1)">-</button>
+            <input type="number" class="textbox" id="lc" onchange="updatescores()" value="0">
+            <button onclick="changeValue('lc', 1)">+</button>
+
             <br>
+
             <p>Major Penalty:</p>
-            <input type="number" id="map" onchange="updatescores()" value="0">
+            <button onclick="changeValue('map', -1)">-</button>
+            <input type="number" class="textbox" id="map" onchange="updatescores()" value="0">
+            <button onclick="changeValue('map', 1)">+</button>
+
             <p>Minor Penalty:</p>
-            <input type="number" id="mip" onchange="updatescores()" value="0">
+            <button onclick="changeValue('mip', -1)">-</button>
+            <input type="number" class="textbox" id="mip" onchange="updatescores()" value="0">
+            <button onclick="changeValue('mip', 1)">+</button>
+
             <p>Location:</p>
-            <select id="lo" onchange="updatescores()">
+            <select id="lo" onchange="updatescores()" class="textbox">
                 <option value="None">--</option>
                 <option value="Observation Zone">OZ</option>
                 <option value="Level 1">Level 1</option>
@@ -92,16 +208,15 @@
         </div>
         <div class="scorescontainer">
             <p>Driver:</p>
-            <input type="text" id="driver" onchange="updatescores()">
+            <input type="text" class="textbox" id="driver" onchange="updatescores()">
             <p>Operator:</p>
-            <input type="text" id="operator" onchange="updatescores()">
+            <input type="text" class="textbox" id="operator" onchange="updatescores()">
             <p>Human Player:</p>
-            <input type="text" id="human" onchange="updatescores()">
+            <input type="text" class="textbox" id="human" onchange="updatescores()">
             <p>Driving Coach:</p>
-            <input type="text" id="coach" onchange="updatescores()">
+            <input type="text" class="textbox" id="coach" onchange="updatescores()">
         </div>
     </div>
-    <button onclick="reset()">Reset</button>
 
     <script src="/socket.io/socket.io.js"></script>
     <script>
@@ -171,6 +286,19 @@
             const mins = Math.floor(seconds / 60);
             const secs = seconds % 60;
             return `${mins}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        function changeValue(id, delta) {
+            let input = document.getElementById(id);
+            let newValue = parseInt(input.value) + delta;
+            if (newValue >= 0) { // Ensuring the value doesn't go below 0
+                input.value = newValue;
+                updatescores(); // Triggering score update
+            }
+        }
+
+        function submitalert(type, time, title, body) {
+            socket.emit('alert', {'type': type, 'time': time, 'title': title, 'body': body});
         }
     </script>
 </body>

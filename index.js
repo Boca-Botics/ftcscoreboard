@@ -2,6 +2,8 @@ const express = require('express');
 const { createServer } = require('node:http');
 const { join } = require('node:path');
 const { Server } = require('socket.io');
+const ip = require('ip');
+const fs = require('fs');
 
 const app = express();
 const server = createServer(app);
@@ -26,10 +28,22 @@ var settings = {
 app.use(express.static('public'))
 
 io.on('connection', (socket) => {
-  console.log('a user connected');
+  //console.log('a user connected');
 
   socket.on('reload', (msg) => {
     io.emit('reload');
+  })
+
+  socket.on('alert', (msg) => {
+    io.emit('alert', msg);
+  })
+
+  socket.on('shutdown', () => {
+    console.warn('User request server shutdown. Goodbye 👋!')
+    server.close(() => {
+      process.exit(0)
+    })
+    process.exit(0)
   })
 
   socket.on('starttimer', (msg) => {
@@ -62,20 +76,17 @@ io.on('connection', (socket) => {
       'coach': msg.coach
     }
 
-    if (msg.lo == "None") {
-      hangpoints = 0;
-    }
-    if (msg.lo == "Observation Zone" || settings.lo == "Level 1") {
-      hangpoints = 3;
-    }
-    if (msg.lo == "Level 2") {
-      hangpoints = 15;
-    }
-    if (msg.lo == "Level 3") {
-      hangpoints = 30;
-    }
+    if (msg.lo == "None") hangpoints = 0;
+    if (msg.lo == "Observation Zone" || msg.lo == "Level 1") hangpoints = 3;
+    if (msg.lo == "Level 2") hangpoints = 15;
+    if (msg.lo == "Level 3") hangpoints = 30;
 
-    settings.total = ((msg.hb*8) + (msg.lb*4) + (msg.net*2) + (msg.hc*10) + (msg.lc*6) + hangpoints) - ((msg.map*15) + (msg.mip*5))
+    settings.total = ((msg.hb * 8) + (msg.lb * 4) + (msg.net * 2) + (msg.hc * 10) + (msg.lc * 6) + hangpoints) - ((msg.map * 15) + (msg.mip * 5))
+
+    fs.appendFile('./public/scores.txt', `${JSON.stringify(settings)}`, function (err) {
+      if (err) throw err;
+      console.log('Saved!');
+    });
 
     io.emit('updateall', settings)
   })
@@ -94,5 +105,5 @@ function updateLoop() {
 setInterval(updateLoop, 1000)
 
 server.listen(3000, () => {
-  console.log('server running at http://localhost:3000');
+  console.log(`Server started, accessable at ${ip.address()}:3000. Administrator page is located at: ${ip.address()}:3000/admin.html`);
 });

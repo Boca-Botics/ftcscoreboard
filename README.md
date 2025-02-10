@@ -10,4 +10,10 @@ To run, make sure you have Node.js installed then download this repo, open the f
 Everything updates in real time. 
 
 ## IMPORTANT 
-Most 
+Most browsers disable audio by default to prevent ads from playing. To enable audio, in the admin dashboard, enable `Developer Mode`, then on the scoreboard website click the `Start Audio` button a few times.
+
+## Equipment:
+What I use is just a $15 FireTV stick with the Amazon Silk website connected to the Rasberry PI I have this hosted on. I don't really reccomend the FireTV because sometimes the connection just drops and the website doesnt recieve sockets anymore until I restart. On top of that the device usually goes to sleep after like 30 minutes. I also just used a spare TV we had and set it up.
+
+## Plans:
+What I want to do in the near futer is turn this into a .exe file that way you don't have to download Node.js
