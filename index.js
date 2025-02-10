@@ -83,11 +83,6 @@ io.on('connection', (socket) => {
 
     settings.total = ((msg.hb * 8) + (msg.lb * 4) + (msg.net * 2) + (msg.hc * 10) + (msg.lc * 6) + hangpoints) - ((msg.map * 15) + (msg.mip * 5))
 
-    fs.appendFile('./public/scores.txt', `${JSON.stringify(settings)}`, function (err) {
-      if (err) throw err;
-      console.log('Saved!');
-    });
-
     io.emit('updateall', settings)
   })
 });

@@ -17,3 +17,10 @@ What I use is just a $15 FireTV stick with the Amazon Silk website connected to 
 
 ## Plans:
 What I want to do in the near futer is turn this into a .exe file that way you don't have to download Node.js
+
+## Pictures
+![picture1](https://i.imgur.com/k8LE5hj.png)
+![picture2](https://i.imgur.com/Am9Ymld.png)
+![picture3](https://i.imgur.com/LjuxEjd.png)
+![picture4](https://i.imgur.com/1ICWnFA.png)
+![picture5](https://i.imgur.com/wgz5Zku.png)
