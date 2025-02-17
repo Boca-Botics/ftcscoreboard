@@ -197,8 +197,16 @@
             <input type="number" class="textbox" id="mip" onchange="updatescores()" value="0">
             <button onclick="changeValue('mip', 1)">+</button>
 
-            <p>Location:</p>
+            <p>Location (Auto):</p>
             <select id="lo" onchange="updatescores()" class="textbox">
+                <option value="None">--</option>
+                <option value="Observation Zone">OZ</option>
+                <option value="Level 1">Level 1</option>
+                <option value="Level 2">Level 2</option>
+                <option value="Level 3">Level 3</option>
+            </select>
+            <p>Location (Teleop):</p>
+            <select id="loau" onchange="updatescores()" class="textbox">
                 <option value="None">--</option>
                 <option value="Observation Zone">OZ</option>
                 <option value="Level 1">Level 1</option>
@@ -249,6 +257,7 @@
                 'map': document.getElementById('map').value,
                 'mip': document.getElementById('mip').value,
                 'lo': document.getElementById('lo').value,
+                'loau': document.getElementById('loau').value,
                 'bgcolor': document.getElementById('bgcolor').value,
                 'silent': document.getElementById('silent').checked,
                 'dev': document.getElementById('dev').checked,

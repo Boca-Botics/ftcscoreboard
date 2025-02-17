@@ -20,6 +20,7 @@ var settings = {
   'map': 0,
   'mip': 0,
   'lo': 0,
+  'loau': 0,
   'bgcolor': '#FF0000',
   'silent': 0,
   'total': 0
@@ -76,10 +77,15 @@ io.on('connection', (socket) => {
       'coach': msg.coach
     }
 
-    if (msg.lo == "None") hangpoints = 0;
-    if (msg.lo == "Observation Zone" || msg.lo == "Level 1") hangpoints = 3;
-    if (msg.lo == "Level 2") hangpoints = 15;
-    if (msg.lo == "Level 3") hangpoints = 30;
+    if (msg.lo == "None") hangpoints = hangpoints + 0;
+    if (msg.lo == "Observation Zone" || msg.lo == "Level 1") hangpoints = hangpoints + 3;
+    if (msg.lo == "Level 2") hangpoints = hangpoints + 15;
+    if (msg.lo == "Level 3") hangpoints = hangpoints + 30;
+
+    if (msg.loau == "None") hangpoints = hangpoints + 0;
+    if (msg.loau == "Observation Zone" || msg.lo == "Level 1") hangpoints = hangpoints + 3;
+    if (msg.loau == "Level 2") hangpoints = hangpoints + 15;
+    if (msg.loau == "Level 3") hangpoints = hangpoints + 30;
 
     settings.total = ((msg.hb * 8) + (msg.lb * 4) + (msg.net * 2) + (msg.hc * 10) + (msg.lc * 6) + hangpoints) - ((msg.map * 15) + (msg.mip * 5))
 

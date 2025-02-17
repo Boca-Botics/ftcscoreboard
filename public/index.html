@@ -61,7 +61,7 @@
 
             <h2>High Chamber: <span id="hc" style="font-weight: bold;">0</span></h2>
             <h2>Low Chamber: <span id="lc" style="font-weight: bold;">0</span></h2>
-            <h2>Location: <span id="lo" style="font-weight: bold;">0</span></h2>
+            <h2>Location: <span id="lo" style="font-weight: bold;">0</span> | <span id="loau" style="font-weight: bold;">0</span></h2>
             <h2>Penalty: <span id="mip" style="font-weight: bold;">0</span> Minor | <span id="map"
                     style="font-weight: bold;">0</span> Major</h2>
         </div>
@@ -94,6 +94,7 @@
             document.getElementById('mip').innerHTML = msg.mip;
             document.getElementById('totalpoints').innerHTML = msg.total;
             document.getElementById('lo').innerHTML = msg.lo;
+            document.getElementById('loau').innerHTML = msg.loau;
 
             document.getElementById('driver').innerHTML = msg.driver;
             document.getElementById('operator').innerHTML = msg.operator;
